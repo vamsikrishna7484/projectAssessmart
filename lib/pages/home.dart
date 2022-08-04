@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class Home extends StatefulWidget {
-  const Home({Key? key}) : super(key: key);
+  const Home({Key? key});
   @override
   State<Home> createState() => _HomeState();
 }
@@ -75,7 +75,7 @@ class _HomeState extends State<Home> {
                   Icons.app_registration_rounded,
                   color: Colors.teal,
                 ),
-                title: const Text('Attendence Registration'),
+                title: const Text('Attendance Registration'),
                 onTap: () {
                   Navigator.pop(context);
                   Navigator.pushNamed(context, '/register_attendence');
@@ -88,10 +88,10 @@ class _HomeState extends State<Home> {
                   Icons.calendar_month,
                   color: Colors.red,
                 ),
-                title: const Text('Attendence'),
+                title: const Text('Attendance'),
                 onTap: () {
                   Navigator.pop(context);
-                  Navigator.pushNamed(context, '/attendence');
+                  Navigator.pushNamed(context, '/attendance');
                 },
               ),
             ),

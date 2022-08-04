@@ -93,18 +93,10 @@ class _CodeBlockState extends State<CodeBlock> {
                       return DropdownMenuItem<String>(
                         value: value,
                         child: Center(
-                          child: OnHover(
-                            //Wraping the DropDownMenuItem child so then when Items of drop down is hovering we see hovering effect
-                            builder: (isHovered) {
-                              final color =
-                                  isHovered ? Colors.blue : Colors.black;
-                              return Text(
-                                value,
-                                style: TextStyle(color: color),
-                              );
-                            },
-                          ),
-                        ),
+                            child: Text(
+                          value,
+                          style: TextStyle(color: Colors.blue),
+                        )),
                       );
                     }).toList(),
                     onChanged: (String? newValue) {
@@ -136,18 +128,10 @@ class _CodeBlockState extends State<CodeBlock> {
                       return DropdownMenuItem<String>(
                         value: value,
                         child: Center(
-                          child: OnHover(
-                            //Wraping the DropDownMenuItem child so then when Items of drop down is hovering we see hovering effect
-                            builder: (isHovered) {
-                              final color =
-                                  isHovered ? Colors.blue : Colors.black;
-                              return Text(
-                                value,
-                                style: TextStyle(color: color),
-                              );
-                            },
-                          ),
-                        ),
+                            child: Text(
+                          value,
+                          style: TextStyle(color: Colors.blue),
+                        )),
                       );
                     }).toList(),
                     onChanged: (String? newValue) {
@@ -186,17 +170,10 @@ class _CodeBlockState extends State<CodeBlock> {
                           return DropdownMenuItem<String>(
                             value: value,
                             child: Center(
-                              child: OnHover(
-                                builder: (isHovered) {
-                                  final color =
-                                      isHovered ? Colors.blue : Colors.black;
-                                  return Text(
-                                    value,
-                                    style: TextStyle(color: color),
-                                  );
-                                },
-                              ),
-                            ),
+                                child: Text(
+                              value,
+                              style: TextStyle(color: Colors.blue),
+                            )),
                           );
                         }).toList(),
                         onChanged: (String? newValue) {
@@ -228,18 +205,10 @@ class _CodeBlockState extends State<CodeBlock> {
                           return DropdownMenuItem<String>(
                             value: value,
                             child: Center(
-                              child: OnHover(
-                                //Wraping the DropDownMenuItem child so then when Items of drop down is hovering we see hovering effect
-                                builder: (isHovered) {
-                                  final color =
-                                      isHovered ? Colors.blue : Colors.black;
-                                  return Text(
-                                    value,
-                                    style: TextStyle(color: color),
-                                  );
-                                },
-                              ),
-                            ),
+                                child: Text(
+                              value,
+                              style: TextStyle(color: Colors.blue),
+                            )),
                           );
                         }).toList(),
                         onChanged: (String? newValue) {

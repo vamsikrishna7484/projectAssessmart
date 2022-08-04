@@ -33,7 +33,7 @@ class _LoginState extends State<Login> {
 }
 
 class LoginForm extends StatefulWidget {
-  const LoginForm({super.key});
+  const LoginForm({key});
 
   @override
   LoginFormState createState() {

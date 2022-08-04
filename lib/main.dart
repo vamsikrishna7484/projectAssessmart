@@ -5,20 +5,33 @@ import 'package:flutter/material.dart';
 import 'package:assessmart/pages/home.dart';
 import 'package:assessmart/pages/register.dart';
 import 'package:assessmart/pages/login.dart';
+import 'package:camera/camera.dart';
+//import 'Attendace.dart';
 
-void main() {
-  runApp(MaterialApp(
+Future<void> main() async {
+  // Ensure that plugin services are initialized so that `availableCameras()`
+  // can be called before `runApp()`
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Obtain a list of the available cameras on the device.
+  final cameras = await availableCameras();
+
+  // Get a specific camera from the list of available cameras.
+  final firstCamera = cameras.first;
+
+  runApp(
+    MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-      ),
+      //theme: ThemeData.dark(),
       routes: {
         '/': (context) => const Home(),
         '/home': (context) => const Home(),
         '/register': (context) => const Register(),
         '/login': (context) => const Login(),
         '/coding_lab': (context) => const CodingLab(),
-        '/attendence': (context) => const Attendence(),
+        '/attendance': (context) => const Attendance(img: null),
         '/register_attendence': (context) => const RegisterAttendence(),
-      }));
+      },
+    ),
+  );
 }

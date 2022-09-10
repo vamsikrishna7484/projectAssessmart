@@ -1,6 +1,6 @@
 {
-    "name": "assessmart",
-    "short_name": "assessmart",
+    "name": "my_work",
+    "short_name": "my_work",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

@@ -1,11 +1,14 @@
-import 'package:assessmart/pages/takepicturescreen.dart';
-import 'package:camera/camera.dart';
-import 'package:flutter/material.dart';
-import 'dart:math';
 import 'dart:ui';
 import 'dart:io';
-
-import '../models/Information.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:camera/camera.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:my_work/models/Information.dart';
+import 'package:my_work/models/UserAttendanceModel.dart';
+import 'package:my_work/models/usermodel.dart';
+import 'package:my_work/screens/takepicturescreen.dart';
 
 class Attendance extends StatefulWidget {
   const Attendance({
@@ -19,6 +22,23 @@ class Attendance extends StatefulWidget {
 
 class _AttendanceState extends State<Attendance> {
   String? subj, Period;
+  final OtpController = TextEditingController();
+  User? user = FirebaseAuth.instance.currentUser;
+  UserAttendanceModel usr_record = UserAttendanceModel();
+  DocumentReference? user_db;
+  UserModel loggedinuser = new UserModel();
+  late List<String> times = [];
+
+  @override
+  void initState() {
+    super.initState();
+    user_db = FirebaseFirestore.instance.collection("users").doc(user!.uid);
+
+    user_db!.get().then((value) {
+      this.loggedinuser = UserModel.fromMap(value.data());
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -171,6 +191,7 @@ class _AttendanceState extends State<Attendance> {
                     color: Colors.white,
                   ),
                   child: TextField(
+                    controller: OtpController,
                     keyboardType: TextInputType.number,
                     decoration: InputDecoration(
                       label: Text("OTP"),
@@ -180,10 +201,106 @@ class _AttendanceState extends State<Attendance> {
             Flexible(
                 flex: 1,
                 child: ElevatedButton(
-                    onPressed: () {}, child: Text("Submit Attendance"))),
+                    onPressed: () async {
+                      Timestamp now = Timestamp.now();
+                      DateTime dateNow = now.toDate();
+                      String? OTP, fID, fname;
+                      user_db = FirebaseFirestore.instance
+                          .collection("users")
+                          .doc(user!.uid);
+                      await user_db!.get().then((value) {
+                        loggedinuser = UserModel.fromMap(value.data());
+                      });
+                      print(loggedinuser.department);
+                      print(loggedinuser.section);
+                      print(subj);
+                      await FirebaseFirestore.instance
+                          .collection(loggedinuser.department!)
+                          .doc("E3")
+                          .collection("Sections")
+                          .doc(loggedinuser.section)
+                          .collection("Subjects")
+                          .doc(subj!)
+                          .collection('Attendance')
+                          .doc(
+                              '${dateNow.day}-${dateNow.month}-${dateNow.year}')
+                          .get()
+                          .then((value) {
+                        OTP = value["OTP"].toString();
+                        print(OTP);
+                        fID = value['fId'];
+                        print(fID);
+                        String time = value['Time'];
+                        print(time);
+                        times = time.split(':');
+                        print(times);
+                      });
+                      print(OTP);
+                      print(OtpController.text);
+                      if (OTP == OtpController.text) {
+                        if (validateTime(dateNow, times)) {
+                          print("hello");
+                        }
+                        ;
+                        await FirebaseFirestore.instance
+                            .collection("faculty")
+                            .doc(fID)
+                            .collection("Subjects")
+                            .doc(subj)
+                            .collection("Sections")
+                            .doc(loggedinuser.section)
+                            .collection("Attendance")
+                            .doc(loggedinuser.userId)
+                            .set({
+                          "name": loggedinuser.userName,
+                          "timestamp": now,
+                          "date":
+                              '${dateNow.day}-${dateNow.month}-${dateNow.year}'
+                        });
+                        AttendStore(Period!, subj!, OtpController.text);
+                      }
+                    },
+                    child: Text("Submit Attendance"))),
           ],
         ),
       ),
     );
+  }
+
+  void AttendStore(String? _period, String? _subject, String? _otp) async {
+    DateTime now = new DateTime.now();
+    String date = new DateTime(now.day, now.month, now.year).toString();
+    usr_record.date = date;
+    usr_record.Period = _period;
+    usr_record.UserId = loggedinuser.userId;
+    usr_record.UserName = loggedinuser.userName;
+    usr_record.Section = loggedinuser.section;
+    usr_record.Subject = _subject;
+    usr_record.department = loggedinuser.department;
+    usr_record.AId = "hello";
+    await user_db!.collection("Attendance-History").add(usr_record.toMap());
+  }
+
+  bool validateTime(DateTime userTime, List<String> facultyTime) {
+    if ((userTime.hour == int.parse(facultyTime[0])) &&
+        (userTime.minute == int.parse(facultyTime[1]))) {
+      return true;
+    } else if ((userTime.hour == int.parse(facultyTime[0])) &&
+        (userTime.minute == int.parse(facultyTime[1]) + 1)) {
+      if (userTime.second < int.parse(facultyTime[2])) {
+        return true;
+      } else {
+        return false;
+      }
+    } else if ((userTime.hour == int.parse(facultyTime[0]) + 1) &&
+        (userTime.minute == 00)) {
+      if (userTime.second < int.parse(facultyTime[2])) {
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      return false;
+    }
   }
 }

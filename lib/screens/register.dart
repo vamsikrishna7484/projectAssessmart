@@ -1,6 +1,15 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
+import 'package:flutter/widgets.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:my_work/models/usermodel.dart';
+//import 'package:my_work/screens/home_screen.dart';
 import 'dart:math';
+
+import 'package:my_work/screens/login.dart';
 
 class Register extends StatefulWidget {
   const Register({Key? key}) : super(key: key);
@@ -49,8 +58,17 @@ class RegistrationFormState extends State<RegistrationForm> {
   //
   // Note: This is a GlobalKey<FormState>,
   // not a GlobalKey<MyCustomFormState>.
+  final _auth = FirebaseAuth.instance;
   final _formKey = GlobalKey<FormState>();
+  String? errorMessage;
   bool _isObscure = true;
+  //editing controller
+  final userId = new TextEditingController();
+  final password = new TextEditingController();
+  final userName = new TextEditingController();
+  String department = "CSE";
+  final email = new TextEditingController();
+  String SECTION = "Section 1";
   String? role, section = 'Section 1', dept = 'CSE';
   @override
   Widget build(BuildContext context) {
@@ -70,10 +88,14 @@ class RegistrationFormState extends State<RegistrationForm> {
                   hintText: 'Enter your Username/ID',
                   labelText: 'Username/ID *',
                 ),
+                // onSaved: (String? value) {
+                //   userId.text = value!;
+                // },
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Username/ID is required';
                   }
+                  userId.text = value;
                   return null;
                 },
               ),
@@ -95,10 +117,14 @@ class RegistrationFormState extends State<RegistrationForm> {
                         });
                       }),
                 ),
+                // onSaved: (String? value) {
+                //   password.text = value!;
+                // },
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Password is required';
                   }
+                  password.text = value;
                   return null;
                 },
               ),
@@ -111,10 +137,14 @@ class RegistrationFormState extends State<RegistrationForm> {
                   hintText: 'Enter your Name',
                   labelText: 'Name *',
                 ),
+                // onSaved: (String? value) {
+                //   userName.text = value!;
+                // },
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Name is required';
                   }
+                  userName.text = value;
                   return null;
                 },
               ),
@@ -124,48 +154,7 @@ class RegistrationFormState extends State<RegistrationForm> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  const Expanded(child: Text('Choose Role')),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: DropdownButton(
-                      value: role,
-                      borderRadius: BorderRadius.circular(8.0),
-                      icon: const Icon(Icons.keyboard_arrow_down),
-                      style: const TextStyle(color: Colors.black),
-                      hint: const Text('Select type'),
-                      underline: Container(
-                        height: 2,
-                        color: Colors.black26,
-                      ),
-                      items: <String>['Student', 'Teacher']
-                          .map<DropdownMenuItem<String>>((String value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Center(
-                            child: Text(
-                              value,
-                              style: TextStyle(color: Colors.blue),
-                            ),
-                          ),
-                        );
-                      }).toList(),
-                      onChanged: (String? newValue) {
-                        setState(() {
-                          role = newValue!;
-                        });
-                      },
-                      isExpanded: true,
-                    ),
-                  )
-                ],
-              ),
-              const SizedBox(
-                height: 20,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  const Expanded(child: Text('Section (for Students)')),
+                  const Expanded(child: Text('Section :')),
                   const SizedBox(width: 10),
                   Expanded(
                     child: DropdownButton(
@@ -217,10 +206,18 @@ class RegistrationFormState extends State<RegistrationForm> {
                   hintText: 'Enter your Email',
                   labelText: 'Email *',
                 ),
+                // onSaved: (String? value) {
+                //   email.text = value!;
+                // },
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Email is required';
                   }
+                  if (!RegExp("^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+.[a-z]")
+                      .hasMatch(value)) {
+                    return ("Please Enter a valid email");
+                  }
+                  email.text = value;
                   return null;
                 },
               ),
@@ -290,6 +287,7 @@ class RegistrationFormState extends State<RegistrationForm> {
                             const SnackBar(content: Text('Processing Data')),
                           );
                         }
+                        signUp(email.text, password.text);
                       },
                       child: const Text('Sign Up'),
                     ),
@@ -312,7 +310,11 @@ class RegistrationFormState extends State<RegistrationForm> {
                         ),
                         recognizer: TapGestureRecognizer()
                           ..onTap = () {
-                            Navigator.pushNamed(context, '/login');
+                            // Navigator.pushNamed(context, '/login');
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => Login()));
                           }),
                   ]),
                 ),
@@ -322,5 +324,74 @@ class RegistrationFormState extends State<RegistrationForm> {
         ),
       ),
     );
+  }
+
+  void signUp(String email, String password) async {
+    if (_formKey.currentState!.validate()) {
+      try {
+        await _auth
+            .createUserWithEmailAndPassword(email: email, password: password)
+            .then((value) => {postDetailsToFirestore()})
+            .catchError((e) {
+          Fluttertoast.showToast(msg: e!.message);
+        });
+      } on FirebaseAuthException catch (error) {
+        switch (error.code) {
+          case "invalid-email":
+            errorMessage = "Your email address appears to be malformed.";
+            break;
+          case "wrong-password":
+            errorMessage = "Your password is wrong.";
+            break;
+          case "user-not-found":
+            errorMessage = "User with this email doesn't exist.";
+            break;
+          case "user-disabled":
+            errorMessage = "User with this email has been disabled.";
+            break;
+          case "too-many-requests":
+            errorMessage = "Too many requests";
+            break;
+          case "operation-not-allowed":
+            errorMessage = "Signing in with Email and Password is not enabled.";
+            break;
+          default:
+            errorMessage = "An undefined Error happened.";
+        }
+        Fluttertoast.showToast(msg: errorMessage!);
+        print(error.code);
+      }
+    }
+  }
+
+  postDetailsToFirestore() async {
+    // calling our firestore
+    // calling our user model
+    // sedning these values
+
+    FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
+    User? user = _auth.currentUser;
+
+    UserModel userModel = UserModel();
+
+    // writing all the values
+    userModel.email = user!.email;
+    userModel.userId = userId.text;
+    userModel.password = password.text;
+    userModel.userName = userName.text;
+    userModel.department = dept;
+    userModel.email = email.text;
+    userModel.section = section;
+    userModel.uId = user.uid;
+    await firebaseFirestore
+        .collection("users")
+        .doc(user.uid)
+        .set(userModel.toMap());
+    Fluttertoast.showToast(msg: "Account created successfully :) ");
+
+    Navigator.pushAndRemoveUntil(
+        (context),
+        MaterialPageRoute(builder: (context) => const Login()),
+        (route) => false);
   }
 }

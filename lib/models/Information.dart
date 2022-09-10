@@ -5,6 +5,7 @@ class Information {
   final List<String> Periods;
   final List<String> AcYear;
   final List<String> Semester;
+  final List<String> Year;
   Information({
     required this.Departments,
     required this.Subjects,
@@ -12,6 +13,7 @@ class Information {
     required this.Periods,
     required this.AcYear,
     required this.Semester,
+    required this.Year,
   });
 }
 
@@ -26,14 +28,14 @@ Information sampleData = Information(
     "MATRIX ALGEBRA"
   ],
   Sections: <String>[
-    "Cse-01",
-    "Cse-02",
-    "Cse-03",
-    "Cse-04",
-    "Cse-05",
-    "Cse-06",
-    "Cse-07",
-    "Cse-08",
+    "Section 1",
+    "Section 2",
+    "Section 3",
+    "Section 4",
+    "Section 5",
+    "Section 6",
+    "Section 7",
+    "Section 8",
   ],
   Periods: [
     "P1",
@@ -46,4 +48,5 @@ Information sampleData = Information(
   ],
   AcYear: ["2020-21", "2021-22", "2022-23"],
   Semester: ["Sem-1", "Sem-2"],
+  Year: ['PUC1', 'PUC2', 'E1', 'E2', 'E3', 'E4'],
 );

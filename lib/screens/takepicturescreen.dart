@@ -1,8 +1,8 @@
 import 'dart:io';
 
-import 'package:assessmart/pages/attendence.dart';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
+import 'package:my_work/Attendace.dart';
 import 'package:path_provider_windows/path_provider_windows.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 

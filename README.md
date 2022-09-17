@@ -32,6 +32,10 @@ studio itself, etc.,
  * Restart Android studio. 
 
 Create New Flutter project In Your android Studio or VS code.
+This the report of my Mini Project.
+
+[report_Updated.pdf](https://github.com/vamsikrishna7484/projectAssessmart/files/9592003/report_Updated.pdf)
+
 
 Below are the pages That I created For this Application.
 SignUp and sign In forms for students and faculty.
